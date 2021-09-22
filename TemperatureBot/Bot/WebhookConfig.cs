@@ -11,12 +11,9 @@ namespace TemperatureBot.Bot
 {
     public class WebhookConfig : IHostedService
     {
-        private IServiceProvider serviceProvider;
-
-        public WebhookConfig(IServiceProvider serviceProvider, IConfiguration configuration)
+        public WebhookConfig(IConfiguration configuration)
         {
             Configuration = configuration;
-            this.serviceProvider = serviceProvider;
         }
 
         public IConfiguration Configuration { get; set; }
@@ -26,7 +23,7 @@ namespace TemperatureBot.Bot
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
             string url = Configuration.GetSection("BotConfig").GetValue<string>("Url");
             var botClient = new TelegramBotClient(token);
-            string hook = url + "/api/update/" + token;
+            string hook = url + "/bot/update/" + token;
             return botClient.SetWebhookAsync(hook);
         }
 

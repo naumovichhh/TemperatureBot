@@ -15,7 +15,7 @@ namespace TemperatureBot.Bot
         {
             Configuration = configuration;
             commands.Add(new StartCommand());
-            commands.Add(new ProbabilityCommand());
+            commands.Add(new SubscribeCommand());
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
             botClient = new TelegramBotClient(token);
         }

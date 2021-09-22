@@ -5,9 +5,9 @@ using Telegram.Bot.Types;
 
 namespace TemperatureBot.Bot
 {
-    public class ProbabilityCommand : ICommand
+    public class SubscribeCommand : ICommand
     {
-        public string Name => "/info";
+        public string Name => "/value";
 
         public bool Contained(Message message)
         {
@@ -16,7 +16,7 @@ namespace TemperatureBot.Bot
                 return false;
             }
 
-            return message.Text.Contains(Name);
+            return message.Text.Split(' ')[0] == Name;
         }
 
         public async Task Execute(Message message, TelegramBotClient botClient)

@@ -50,9 +50,12 @@ namespace TemperatureBot
 
             app.UseAuthorization();
 
+            string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllerRoute("webhook", $"bot/update/{token}", new { controller = "Bot", action = "Post" });
+                endpoints.MapControllerRoute("webhook", $"bot/info/{token}", new { controller = "Bot", action = "Get" });
             });
         }
     }

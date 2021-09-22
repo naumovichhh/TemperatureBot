@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -15,7 +16,7 @@ namespace TemperatureBot.Bot
                 return false;
             }
 
-            return message.Text.Contains(Name);
+            return message.Text.Split(' ')[0] == Name;
         }
 
         public async Task Execute(Message message, TelegramBotClient botClient)
