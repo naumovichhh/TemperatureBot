@@ -1,20 +1,22 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace TemperatureBot.Bot
 {
-    public class StartCommand : ICommand
+    public class StopCommand : ICommand
     {
         private Notificator notificator;
 
-        public StartCommand(Notificator notificator)
+        public StopCommand(Notificator notificator)
         {
             this.notificator = notificator;
         }
 
-        public string Name => "/start";
+        public string Name => "/stop";
 
         public bool Contained(Message message)
         {
@@ -31,8 +33,8 @@ namespace TemperatureBot.Bot
             long chatId = message.Chat.Id;
             try
             {
-                notificator.Subscribe(chatId);
-                await botClient.SendTextMessageAsync(chatId, "Вы подписались на оповещения.");
+                notificator.Unsubscribe(chatId);
+                await botClient.SendTextMessageAsync(chatId, "Вы отменили подписку.");
             }
             catch (System.Exception)
             {

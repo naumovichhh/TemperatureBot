@@ -21,7 +21,7 @@ namespace TemperatureBot.Bot
         public Task StartAsync(CancellationToken cancellationToken)
         {
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
-            string url = Configuration.GetSection("BotConfig").GetValue<string>("Url");
+            string url = Configuration.GetSection("BotConfig").GetValue<string>("Webhook");
             var botClient = new TelegramBotClient(token);
             string hook = url + "/bot/update/" + token;
             return botClient.SetWebhookAsync(hook);

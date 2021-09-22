@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TemperatureBot.Bot;
 
 namespace TemperatureBot
 {
@@ -21,6 +23,13 @@ namespace TemperatureBot
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddScoped<Handler>();
+                    services.AddHostedService<WebhookConfig>();
+                    services.AddSingleton<Notificator>();
+                    services.AddHostedService<Notificator>(p => p.GetRequiredService<Notificator>());
                 });
     }
 }

@@ -14,11 +14,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "BotConfig__Url": "https://2a9b-86-57-174-234.ngrok.io",
-        "BotConfig__Token": "2047928536:AAGx6Q3A329eqNV4dKeC94OtygfxKPGsBC8",
-        "BotConfig__Name": "Температура",
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "BotConfig__Thermometer": "http://10.194.1.14"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "TemperatureBot": {
