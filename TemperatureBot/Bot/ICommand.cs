@@ -8,6 +8,14 @@ namespace TemperatureBot.Bot
     {
         string Name { get; }
         Task Execute(Message message, TelegramBotClient botClient);
-        bool Contained(Message message);
+        bool Contained(Message message)
+        {
+            if (message.Type != Telegram.Bot.Types.Enums.MessageType.Text)
+            {
+                return false;
+            }
+
+            return message.Text.Split(' ')[0] == Name;
+        }
     }
 }

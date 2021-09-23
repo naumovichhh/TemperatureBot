@@ -9,31 +9,26 @@ namespace TemperatureBot.Bot
 {
     public class StopCommand : ICommand
     {
-        private Notificator notificator;
+        private ThermometerObserver notificator;
 
-        public StopCommand(Notificator notificator)
+        public StopCommand(ThermometerObserver notificator)
         {
             this.notificator = notificator;
         }
 
         public string Name => "/stop";
 
-        public bool Contained(Message message)
-        {
-            if (message.Type != Telegram.Bot.Types.Enums.MessageType.Text)
-            {
-                return false;
-            }
-
-            return message.Text.Split(' ')[0] == Name;
-        }
-
         public async Task Execute(Message message, TelegramBotClient botClient)
         {
             long chatId = message.Chat.Id;
             try
             {
-                notificator.Unsubscribe(chatId);
+                if (!notificator.Unsubscribe(chatId))
+                {
+                    await botClient.SendTextMessageAsync(chatId, "Вы не подписаны.");
+                    return;
+                }
+
                 await botClient.SendTextMessageAsync(chatId, "Вы отменили подписку.");
             }
             catch (System.Exception)

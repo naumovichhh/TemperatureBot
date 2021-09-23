@@ -11,12 +11,14 @@ namespace TemperatureBot.Bot
         private TelegramBotClient botClient;
         private List<ICommand> commands = new List<ICommand>();
 
-        public Handler(IConfiguration configuration, Notificator notificator)
+        public Handler(IConfiguration configuration, ThermometerObserver notificator)
         {
             Configuration = configuration;
             commands.Add(new StartCommand(notificator));
             commands.Add(new StopCommand(notificator));
             commands.Add(new ValueCommand(notificator));
+            commands.Add(new SetHighBoundCommand(notificator, Configuration.GetSection("BotConfig").GetValue<string>("Token")));
+            commands.Add(new SetLowBoundCommand(notificator, Configuration.GetSection("BotConfig").GetValue<string>("Token")));
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
             botClient = new TelegramBotClient(token);
         }

@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TemperatureBot.Bot;
@@ -23,7 +21,11 @@ namespace TemperatureBot.Controllers
                 return Ok();
 
             var message = update.Message;
-            await handler.Execute(message);
+            if (message != null)
+            {
+                await handler.Execute(message);
+            }
+
             return Ok();
         }
 

@@ -7,31 +7,26 @@ namespace TemperatureBot.Bot
 {
     public class StartCommand : ICommand
     {
-        private Notificator notificator;
+        private ThermometerObserver notificator;
 
-        public StartCommand(Notificator notificator)
+        public StartCommand(ThermometerObserver notificator)
         {
             this.notificator = notificator;
         }
 
         public string Name => "/start";
 
-        public bool Contained(Message message)
-        {
-            if (message.Type != Telegram.Bot.Types.Enums.MessageType.Text)
-            {
-                return false;
-            }
-
-            return message.Text.Split(' ')[0] == Name;
-        }
-
         public async Task Execute(Message message, TelegramBotClient botClient)
         {
             long chatId = message.Chat.Id;
             try
             {
-                notificator.Subscribe(chatId);
+                if (!notificator.Subscribe(chatId))
+                {
+                    await botClient.SendTextMessageAsync(chatId, "Вы уже подписаны.");
+                    return;
+                }
+
                 await botClient.SendTextMessageAsync(chatId, "Вы подписались на оповещения.");
             }
             catch (System.Exception)
