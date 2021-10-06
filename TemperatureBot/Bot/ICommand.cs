@@ -15,7 +15,7 @@ namespace TemperatureBot.Bot
                 return false;
             }
 
-            return message.Text.Split(' ')[0] == Name;
+            return message.Text.Split(' ', '@')[0] == Name;
         }
     }
 }
