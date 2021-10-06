@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using TemperatureBot.Bot;
 
 namespace TemperatureBot
@@ -17,6 +18,10 @@ namespace TemperatureBot
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.ConfigureLogging((ctx, logging) => 
+                    {
+                        logging.AddEventLog(options => options.SourceName = "Temperature Bot");
+                    });
                 })
                 .ConfigureServices(services =>
                 {
