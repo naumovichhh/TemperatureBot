@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace TemperatureBot.Bot
+namespace TemperatureBot.Bot.Commands
 {
     public class SetLowBoundCommand : ICommand
     {
@@ -34,7 +34,7 @@ namespace TemperatureBot.Bot
 
                 int value = int.Parse(message.Text.Split(' ')[2]);
                 notificator.SetLowerBound(value);
-                await botClient.SendTextMessageAsync(chatId, $"Нижняя допустимый порог установлен: {value}.");
+                await botClient.SendTextMessageAsync(chatId, $"Нижний допустимый порог установлен: {value}.");
             }
             catch (System.Exception)
             {

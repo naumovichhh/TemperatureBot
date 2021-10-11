@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,45 +25,66 @@ namespace TemperatureBot.Bot
         private bool initialMeasurement = true;
         private decimal temperature;
         private TelegramBotClient botClient;
-        private string idsFileName = "Ids";
+        private readonly string idsFileName = "Ids";
+        private readonly string boundsFileName = "Bounds";
 
         public ThermometerObserver(IConfiguration configuration)
         {
             Configuration = configuration;
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
+            /*var webProxy = new WebProxy("10.195.30.50", Port: 8080);
+            var httpClient = new HttpClient(
+                new HttpClientHandler { Proxy = webProxy, UseProxy = true }
+            );
+            botClient = new TelegramBotClient(token, httpClient);*/
             botClient = new TelegramBotClient(token);
             ThermometerUri = GetThermometerUri();
-            LoadFile();
-            //Instance = this;
+            LoadFiles();
         }
 
-        //public static Notificator Instance { get; private set; }
         public IConfiguration Configuration { get; set; }
+        
         public string ThermometerUri { get; private set; }
 
-        public void SetUpperBound(int value)
+        public int UpperBound
         {
-            if (value <= lowerBound)
+            get
             {
-                throw new ArgumentException(nameof(value));
+                return upperBound;
             }
-
-            lock (boundLock)
+            set
             {
-                upperBound = value;
+                if (value <= lowerBound)
+                {
+                    throw new ArgumentException(nameof(value));
+                }
+
+                lock (boundLock)
+                {
+                    throw new NotImplementedException();
+                    upperBound = value;
+                }
             }
         }
 
-        public void SetLowerBound(int value)
+        public int LowerBound
         {
-            if (value >= upperBound)
+            get
             {
-                throw new ArgumentException(nameof(value));
+                return lowerBound;
             }
-
-            lock (boundLock)
+            set
             {
-                lowerBound = value;
+                if (value >= upperBound)
+                {
+                    throw new ArgumentException(nameof(value));
+                }
+
+                lock (boundLock)
+                {
+                    throw new NotImplementedException();
+                    lowerBound = value;
+                }
             }
         }
 
@@ -124,7 +147,7 @@ namespace TemperatureBot.Bot
             }
         }
 
-        private void LoadFile()
+        private void LoadFiles()
         {
             if (File.Exists(idsFileName))
             {
@@ -144,6 +167,42 @@ namespace TemperatureBot.Bot
             else
             {
                 File.Create(idsFileName).Close();
+            }
+
+            if (File.Exists(boundsFileName))
+            {
+                using (var reader = File.OpenText(boundsFileName))
+                {
+                    int lowerBound, upperBound;
+                    string str;
+                    if ((str = reader.ReadLine()) != null)
+                    {
+                        if (int.TryParse(str, out lowerBound))
+                        {
+                            this.lowerBound = lowerBound;
+                        }
+                    }
+                    
+                    if ((str = reader.ReadLine()) != null)
+                    {
+                        if (int.TryParse(str, out upperBound))
+                        {
+                            this.upperBound = upperBound;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                File.Create(boundsFileName);
+            }
+        }
+
+        private void LoadBoundsDefault()
+        {
+            using (var writer = File.CreateText(boundsFileName))
+            {
+
             }
         }
 

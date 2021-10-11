@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using TemperatureBot.Bot.Commands;
 
 namespace TemperatureBot.Bot
 {
@@ -20,6 +23,11 @@ namespace TemperatureBot.Bot
             commands.Add(new SetHighBoundCommand(notificator, Configuration.GetSection("BotConfig").GetValue<string>("Token")));
             commands.Add(new SetLowBoundCommand(notificator, Configuration.GetSection("BotConfig").GetValue<string>("Token")));
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
+            /*var webProxy = new WebProxy("10.195.30.50", Port: 8080);
+            var httpClient = new HttpClient(
+                new HttpClientHandler { Proxy = webProxy, UseProxy = true }
+            );
+            botClient = new TelegramBotClient(token, httpClient);*/
             botClient = new TelegramBotClient(token);
         }
 

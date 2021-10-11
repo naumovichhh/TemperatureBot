@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace TemperatureBot.Bot
+namespace TemperatureBot.Bot.Commands
 {
     public class SetHighBoundCommand : ICommand
     {

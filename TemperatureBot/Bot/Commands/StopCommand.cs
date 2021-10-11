@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace TemperatureBot.Bot
+namespace TemperatureBot.Bot.Commands
 {
     public class StopCommand : ICommand
     {
