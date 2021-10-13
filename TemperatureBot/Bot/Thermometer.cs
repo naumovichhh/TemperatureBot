@@ -14,13 +14,13 @@ using Telegram.Bot;
 
 namespace TemperatureBot.Bot
 {
-    public class ThermometerObserver : BackgroundService
+    public class Thermometer : BackgroundService
     {
         private List<long> chatIds = new List<long>();
         private object chatIdsLock = new object();
-        private object boundLock = new object();
-        private int upperBound = 20;
-        private int lowerBound = 18;
+        private object boundsLock = new object();
+        private int upperBound;
+        private int lowerBound;
         private bool tempAcceptable = true;
         private bool initialMeasurement = true;
         private decimal temperature;
@@ -28,16 +28,16 @@ namespace TemperatureBot.Bot
         private readonly string idsFileName = "Ids";
         private readonly string boundsFileName = "Bounds";
 
-        public ThermometerObserver(IConfiguration configuration)
+        public Thermometer(IConfiguration configuration)
         {
             Configuration = configuration;
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
-            /*var webProxy = new WebProxy("10.195.30.50", Port: 8080);
+            var webProxy = new WebProxy("10.195.30.50", Port: 8080);
             var httpClient = new HttpClient(
                 new HttpClientHandler { Proxy = webProxy, UseProxy = true }
             );
-            botClient = new TelegramBotClient(token, httpClient);*/
-            botClient = new TelegramBotClient(token);
+            botClient = new TelegramBotClient(token, httpClient);
+            //botClient = new TelegramBotClient(token);
             ThermometerUri = GetThermometerUri();
             LoadFiles();
         }
@@ -59,11 +59,12 @@ namespace TemperatureBot.Bot
                     throw new ArgumentException(nameof(value));
                 }
 
-                lock (boundLock)
+                lock (boundsLock)
                 {
-                    throw new NotImplementedException();
                     upperBound = value;
                 }
+
+                RefreshBoundsFile();
             }
         }
 
@@ -80,11 +81,12 @@ namespace TemperatureBot.Bot
                     throw new ArgumentException(nameof(value));
                 }
 
-                lock (boundLock)
+                lock (boundsLock)
                 {
-                    throw new NotImplementedException();
                     lowerBound = value;
                 }
+
+                RefreshBoundsFile();
             }
         }
 
@@ -99,7 +101,7 @@ namespace TemperatureBot.Bot
                 else
                 {
                     chatIds.Add(chatId);
-                    RefreshFile();
+                    RefreshChatIdsFile();
                     return true;
                 }
             }
@@ -115,7 +117,7 @@ namespace TemperatureBot.Bot
                 }
                 else
                 {
-                    RefreshFile();
+                    RefreshChatIdsFile();
                     return true;
                 }
             }
@@ -136,8 +138,14 @@ namespace TemperatureBot.Bot
             }
         }
 
-        private void RefreshFile()
+        private void RefreshChatIdsFile()
         {
+            List<long> chatIds;
+            lock (chatIdsLock)
+            {
+                chatIds = this.chatIds;
+            }
+            
             using (var writer = new StreamWriter(File.Open(idsFileName, FileMode.Create)))
             {
                 foreach (var chatId in chatIds)
@@ -147,8 +155,32 @@ namespace TemperatureBot.Bot
             }
         }
 
+        private void RefreshBoundsFile()
+        {
+            int lowerBound, upperBound;
+            lock (boundsLock)
+            {
+                lowerBound = this.lowerBound;
+                upperBound = this.upperBound;
+            }
+
+            using (var writer = File.CreateText(boundsFileName))
+            {
+                writer.WriteLine(lowerBound);
+                writer.WriteLine(upperBound);
+            }
+        }
+
         private void LoadFiles()
         {
+            LoadChatIdsFile();
+            LoadBoundsFile();
+        }
+
+        private void LoadChatIdsFile()
+        {
+            List<long> chatIds = new List<long>();
+
             if (File.Exists(idsFileName))
             {
                 using (var reader = File.OpenText(idsFileName))
@@ -169,41 +201,50 @@ namespace TemperatureBot.Bot
                 File.Create(idsFileName).Close();
             }
 
+            lock (chatIdsLock)
+            {
+                this.chatIds = chatIds;
+            }
+        }
+
+        private void LoadBoundsFile()
+        {
             if (File.Exists(boundsFileName))
             {
                 using (var reader = File.OpenText(boundsFileName))
                 {
                     int lowerBound, upperBound;
                     string str;
-                    if ((str = reader.ReadLine()) != null)
+                    if ((str = reader.ReadLine()) != null && int.TryParse(str, out lowerBound))
                     {
-                        if (int.TryParse(str, out lowerBound))
-                        {
-                            this.lowerBound = lowerBound;
-                        }
+                        this.lowerBound = lowerBound;
                     }
-                    
-                    if ((str = reader.ReadLine()) != null)
+                    else
                     {
-                        if (int.TryParse(str, out upperBound))
-                        {
-                            this.upperBound = upperBound;
-                        }
+                        LoadBoundsFileDefault();
+                    }
+
+                    if ((str = reader.ReadLine()) != null && int.TryParse(str, out upperBound))
+                    {
+                        this.upperBound = upperBound;
+                    }
+                    else
+                    {
+                        LoadBoundsFileDefault();
                     }
                 }
             }
             else
             {
-                File.Create(boundsFileName);
+                LoadBoundsFileDefault();
             }
         }
 
-        private void LoadBoundsDefault()
+        private void LoadBoundsFileDefault()
         {
-            using (var writer = File.CreateText(boundsFileName))
-            {
-
-            }
+            lowerBound = 18;
+            upperBound = 20;
+            RefreshBoundsFile();
         }
 
         private void HandleNotifications(decimal measured)

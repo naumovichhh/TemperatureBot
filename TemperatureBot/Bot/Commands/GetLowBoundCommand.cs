@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -9,12 +7,12 @@ namespace TemperatureBot.Bot.Commands
 {
     public class GetLowBoundCommand : ICommand
     {
-        private ThermometerObserver notificator;
+        private Thermometer thermometer;
         private string token;
 
-        public GetLowBoundCommand(ThermometerObserver notificator, string token)
+        public GetLowBoundCommand(Thermometer thermometer, string token)
         {
-            this.notificator = notificator;
+            this.thermometer = thermometer;
             this.token = token;
         }
 
@@ -23,15 +21,15 @@ namespace TemperatureBot.Bot.Commands
         public async Task Execute(Message message, TelegramBotClient botClient)
         {
             long chatId = message.Chat.Id;
-            string token = message.Text.Split(' ')[1];
-            if (token != this.token)
+            try
             {
-                await botClient.SendTextMessageAsync(chatId, "Неправильное значение токена");
-                return;
+                var lowerBound = thermometer.LowerBound;
+                await botClient.SendTextMessageAsync(chatId, $"Нижний допустимый порог: {lowerBound}.");
             }
-
-            var lowerBound = notificator.GetLowerBound();
-            await botClient.SendTextMessageAsync(chatId, $"Нижний допустимый порог: {lowerBound}.");
+            catch (Exception)
+            {
+                await botClient.SendTextMessageAsync(chatId, "Произошла ошибка.");
+            }
         }
     }
 }

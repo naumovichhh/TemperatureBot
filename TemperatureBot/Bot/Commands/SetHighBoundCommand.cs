@@ -7,12 +7,12 @@ namespace TemperatureBot.Bot.Commands
 {
     public class SetHighBoundCommand : ICommand
     {
-        private ThermometerObserver notificator;
+        private Thermometer thermometer;
         private string token;
 
-        public SetHighBoundCommand(ThermometerObserver notificator, string token)
+        public SetHighBoundCommand(Thermometer thermometer, string token)
         {
-            this.notificator = notificator;
+            this.thermometer = thermometer;
             this.token = token;
         }
 
@@ -26,12 +26,12 @@ namespace TemperatureBot.Bot.Commands
                 string token = message.Text.Split(' ')[1];
                 if (token != this.token)
                 {
-                    await botClient.SendTextMessageAsync(chatId, "Неправильное значение токена");
+                    await botClient.SendTextMessageAsync(chatId, "Неправильное значение токена.");
                     return;
                 }
 
                 int value = int.Parse(message.Text.Split(' ')[2]);
-                notificator.SetUpperBound(value);
+                thermometer.UpperBound = value;
                 await botClient.SendTextMessageAsync(chatId, $"Верхний допустимый порог установлен: {value}.");
             }
             catch (System.Exception)

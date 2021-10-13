@@ -14,21 +14,23 @@ namespace TemperatureBot.Bot
         private TelegramBotClient botClient;
         private List<ICommand> commands = new List<ICommand>();
 
-        public Handler(IConfiguration configuration, ThermometerObserver notificator)
+        public Handler(IConfiguration configuration, Thermometer thermometer)
         {
             Configuration = configuration;
-            commands.Add(new StartCommand(notificator));
-            commands.Add(new StopCommand(notificator));
-            commands.Add(new ValueCommand(notificator));
-            commands.Add(new SetHighBoundCommand(notificator, Configuration.GetSection("BotConfig").GetValue<string>("Token")));
-            commands.Add(new SetLowBoundCommand(notificator, Configuration.GetSection("BotConfig").GetValue<string>("Token")));
             string token = Configuration.GetSection("BotConfig").GetValue<string>("Token");
-            /*var webProxy = new WebProxy("10.195.30.50", Port: 8080);
+            commands.Add(new StartCommand(thermometer));
+            commands.Add(new StopCommand(thermometer));
+            commands.Add(new ValueCommand(thermometer));
+            commands.Add(new SetHighBoundCommand(thermometer, token));
+            commands.Add(new SetLowBoundCommand(thermometer, token));
+            commands.Add(new GetHighBoundCommand(thermometer, token));
+            commands.Add(new GetLowBoundCommand(thermometer, token));
+            var webProxy = new WebProxy("10.195.30.50", Port: 8080);
             var httpClient = new HttpClient(
                 new HttpClientHandler { Proxy = webProxy, UseProxy = true }
             );
-            botClient = new TelegramBotClient(token, httpClient);*/
-            botClient = new TelegramBotClient(token);
+            botClient = new TelegramBotClient(token, httpClient);
+            //botClient = new TelegramBotClient(token);
         }
 
         public IConfiguration Configuration { get; set; }

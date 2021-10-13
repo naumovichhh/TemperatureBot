@@ -6,18 +6,18 @@ namespace TemperatureBot.Bot.Commands
 {
     public class ValueCommand : ICommand
     {
-        private ThermometerObserver notificator;
+        private Thermometer thermometer;
 
-        public ValueCommand(ThermometerObserver notificator)
+        public ValueCommand(Thermometer notificator)
         {
-            this.notificator = notificator;
+            this.thermometer = notificator;
         }
 
         public string Name => "/value";
 
         public async Task Execute(Message message, TelegramBotClient botClient)
         {
-            decimal? temperatureN = notificator.GetCurrentTemperature();
+            decimal? temperatureN = thermometer.GetCurrentTemperature();
             long chatId = message.Chat.Id;
             if (temperatureN.HasValue)
             {

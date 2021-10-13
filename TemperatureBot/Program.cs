@@ -27,8 +27,8 @@ namespace TemperatureBot
                 {
                     services.AddScoped<Handler>();
                     services.AddHostedService<WebhookConfig>();
-                    services.AddSingleton<ThermometerObserver>();
-                    services.AddHostedService<ThermometerObserver>(p => p.GetRequiredService<ThermometerObserver>());
+                    services.AddSingleton<Thermometer>();
+                    services.AddHostedService<Thermometer>(p => p.GetRequiredService<Thermometer>());
                 });
     }
 }

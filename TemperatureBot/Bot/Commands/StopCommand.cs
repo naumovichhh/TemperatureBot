@@ -9,11 +9,11 @@ namespace TemperatureBot.Bot.Commands
 {
     public class StopCommand : ICommand
     {
-        private ThermometerObserver notificator;
+        private Thermometer thermometer;
 
-        public StopCommand(ThermometerObserver notificator)
+        public StopCommand(Thermometer thermometer)
         {
-            this.notificator = notificator;
+            this.thermometer = thermometer;
         }
 
         public string Name => "/stop";
@@ -23,7 +23,7 @@ namespace TemperatureBot.Bot.Commands
             long chatId = message.Chat.Id;
             try
             {
-                if (!notificator.Unsubscribe(chatId))
+                if (!thermometer.Unsubscribe(chatId))
                 {
                     await botClient.SendTextMessageAsync(chatId, "Вы не подписаны.");
                     return;

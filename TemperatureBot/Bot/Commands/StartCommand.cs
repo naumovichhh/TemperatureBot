@@ -7,11 +7,11 @@ namespace TemperatureBot.Bot.Commands
 {
     public class StartCommand : ICommand
     {
-        private ThermometerObserver notificator;
+        private Thermometer thermometer;
 
-        public StartCommand(ThermometerObserver notificator)
+        public StartCommand(Thermometer thermometer)
         {
-            this.notificator = notificator;
+            this.thermometer = thermometer;
         }
 
         public string Name => "/start";
@@ -21,7 +21,7 @@ namespace TemperatureBot.Bot.Commands
             long chatId = message.Chat.Id;
             try
             {
-                if (!notificator.Subscribe(chatId))
+                if (!thermometer.Subscribe(chatId))
                 {
                     await botClient.SendTextMessageAsync(chatId, "Вы уже подписаны.");
                     return;
