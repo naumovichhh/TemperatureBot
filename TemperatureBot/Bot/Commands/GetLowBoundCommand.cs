@@ -28,7 +28,13 @@ namespace TemperatureBot.Bot.Commands
             }
             catch (Exception)
             {
-                await botClient.SendTextMessageAsync(chatId, "Произошла ошибка.");
+                try
+                {
+                    await botClient.SendTextMessageAsync(chatId, "Произошла ошибка.");
+                }
+                catch (System.Exception)
+                {
+                }
             }
         }
     }
